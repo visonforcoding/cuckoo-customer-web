@@ -7,9 +7,9 @@
       </q-chip>
       <q-chip>
         <q-avatar>
-          <img src="https://cdn.quasar.dev/img/boy-avatar.png">
+          <img v-bind:src="user.cover">
         </q-avatar>
-        vison
+        {{ user.name }}
       </q-chip>
     </div>
 
@@ -47,6 +47,20 @@
 </template>
 <script>
 export default {
-  name: 'Sidebar'
+  name: 'Sidebar',
+   data() {
+    return {
+      user: {
+        name:"unknow",
+        cover:"https://cdn.quasar.dev/img/boy-avatar.png"
+      },
+    };
+  },
+  created() {
+    let userStr = window.sessionStorage.getItem("user")
+    let user = JSON.parse(userStr)
+    this.user.name = user.name
+    this.user.cover = user.cover
+  },
 }
 </script>

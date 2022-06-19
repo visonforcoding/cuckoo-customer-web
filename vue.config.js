@@ -9,5 +9,16 @@ module.exports = defineConfig({
       importStrategy: 'kebab',
       rtlSupport: false
     }
+  },
+  devServer: {
+    proxy: {
+      "^/api": {
+        target: "http://localhost:8081",
+        changeOrigin: true,
+        pathRewrite: {
+          '^/api': '/',   //重写请求路径
+        },
+      }
+    }
   }
 })

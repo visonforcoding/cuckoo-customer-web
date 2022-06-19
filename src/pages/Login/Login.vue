@@ -1,71 +1,62 @@
 <template>
-  <div class="q-pa-md" style="max-width: 400px">
-    <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-md">
-      <q-input
-        filled
-        v-model="name"
-        label="Your name *"
-        hint="Name and surname"
-      />
+    <div class="q-pa-md" style="max-width: 400px">
+        <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-md">
+            <q-input filled v-model="username" label="Your name *" hint="Name and surname" />
 
-      <q-input
-        filled
-        type="password"
-        v-model="password"
-        label="Your password *"
-      />
+            <q-input filled type="password" v-model="pwd" label="Your password *" />
 
-      <div>
-        <q-btn label="Submit" type="submit" color="primary" />
-        <q-btn label="Reset" type="reset" color="primary" flat class="q-ml-sm" />
-      </div>
-    </q-form>
-  </div>
+            <div>
+                <q-btn label="Submit" type="submit" color="primary" />
+                <q-btn label="Reset" type="reset" color="primary" flat class="q-ml-sm" />
+            </div>
+        </q-form>
+    </div>
 </template>
 <script>
+import service from "@/api/request";
 export default {
-  name: "login",
-  data() {
-    return {
-      name: "vison.cao",
-      password: null
-    };
-  },
-  methods: {
-    onSubmit() {
-      switch (this.name) {
-        case "vison":
-          this.logind(101);
-          break;
-        case "snake":
-          this.logind(102);
-          break;
-        default:
-          this.$q.notify({
-            color: "green-4",
-            textColor: "white",
-            icon: "cloud_done",
-            message: "登录失败"
-          });
-          this.onReset()
-          break;
-      }
+    name: "login",
+    data() {
+        return {
+            username: "",
+            pwd: null,
+        };
     },
-    logind(uid) {
-      this.$q.notify({
-        color: "green-4",
-        textColor: "white",
-        icon: "cloud_done",
-        message: "登录成功"
-      });
-      window.sessionStorage.setItem("token", uid);
-      this.$router.push("/chat/0");
+    methods: {
+        onSubmit() {
+            service
+                .post("/user/hand-login", {
+                    username: this.username,
+                    pwd: this.pwd,
+                })
+                .then((response) => {
+                    if (response.code !== 0) {
+                        this.$q.notify({
+                            color: "green-4",
+                            textColor: "white",
+                            icon: "cloud_done",
+                            message: response.msg,
+                        });
+                    } else {
+                        window.sessionStorage.setItem("token", response.data.token);
+                        window.sessionStorage.setItem("user",JSON.stringify(response.data));
+                        this.$router.push("/chat/0");
+                    }
+                });
+        },
+        logind(uid) {
+            this.$q.notify({
+                color: "green-4",
+                textColor: "white",
+                icon: "cloud_done",
+                message: "登录成功",
+            });
+        },
+        onReset() {
+            this.name = null;
+            this.age = null;
+            this.accept = false;
+        },
     },
-    onReset() {
-      this.name = null;
-      this.age = null;
-      this.accept = false;
-    }
-  }
 };
 </script>

@@ -3,7 +3,7 @@
     <div id="chat-window" style="width: 100%;">
       <template v-for="msg in msgData">
         <q-chat-message
-          name="<span class='text-positive'>Trusted Source</span>"
+          name="vison"
           avatar="https://cdn.quasar.dev/img/avatar3.jpg"
           :text="[msg.body]"
           stamp="7 minutes ago"
@@ -13,7 +13,7 @@
           :key="msg.id"
         />
         <q-chat-message
-          name="<span class='text-negative'>Jane (untrusted text but trusted name)</span>"
+          name="snake"
           avatar="https://cdn.quasar.dev/img/avatar5.jpg"
           :text="[
            msg.body,
@@ -34,6 +34,7 @@
 <script>
 import MsgForm from "./components/MsgForm";
 import config from "@/config";
+import Message from "@/model/message.js";
 
 export default {
   name: "chat",
@@ -72,8 +73,12 @@ export default {
     websocketonopen() {
       //连接建立之后执行send方法发送数据
       console.log("发送数据");
-      let actions = { uid: parseInt(sessionStorage.getItem('token')), type: "auth" };
-      this.websocketsend(actions);
+     let message = new Message()
+     message.type = "auth";
+     message.from = sessionStorage.getItem('token');
+     message.body = "";
+     message.to = "system";
+     this.wsClient.send(JSON.stringify(message));
     },
     websocketonerror() {
       //连接建立失败重连
@@ -87,7 +92,6 @@ export default {
     },
     websocketsend(Data) {
       
-      //   let data = this.text
       //数据发送
       this.msgData.push(Data);
       let message = JSON.stringify(Data);
@@ -98,7 +102,8 @@ export default {
       message["body"] = data;
       message["type"] = "text";
       message["send"] = true;
-      message["receiveId"] = this.$route.params.to;
+      message["to"] = this.$route.params.to;
+      message["token"] = parseInt(sessionStorage.getItem('token'));
       console.log(this.$route.params.to);
       this.websocketsend(message);
     },
